@@ -6,15 +6,31 @@ export default function Home() {
   const [quantities, setQuantities] = useState({});
   const token = localStorage.getItem("token");
 
-  useEffect(async () => {
-    const allProducts = await request("/products", "GET");
-    setProducts(allProducts);
+  useEffect(() => {
+    let cancelled = false;
 
-    const initialQuantities = {};
-    allProducts.forEach((product) => {
-      initialQuantities[product.id] = 1;
-    });
-    setQuantities(initialQuantities);
+    const fetchProducts = async () => {
+      try {
+        const allProducts = await request("/products", "GET");
+        if (cancelled) return;
+
+        setProducts(allProducts);
+
+        const initialQuantities = {};
+        allProducts.forEach((product) => {
+          initialQuantities[product.id] = 1;
+        });
+        setQuantities(initialQuantities);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleQuantityChange = (productId, value) => {

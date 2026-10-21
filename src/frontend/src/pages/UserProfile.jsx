@@ -37,20 +37,23 @@ export default function UserProfile() {
     setMessage("");
 
     try {
-      const res = await request("/users/me", "PATCH", {
+      const data = await request("/users/me", "PATCH", {
         username: user.username,
         address: user.address,
       });
 
-      if (res && (res.ok || res.id)) {
-        const data = await res.json();
+      if (data && (data.ok || data.id)) {
         setMessage("Update successful!");
 
-        localStorage.setItem("username", data.user.username);
+        if (data.username) {
+          localStorage.setItem("username", data.username);
+          setUser((prev) => ({ ...prev, username: data.username }));
+        }
       } else {
         setMessage("Update failed. Please try again.");
       }
     } catch (error) {
+      console.error("Error updating profile:", error);
       setMessage("Error connecting to server.");
     }
   };
@@ -128,6 +131,20 @@ export default function UserProfile() {
           Update Information
         </button>
       </form>
+
+      {message && (
+        <p
+          style={{
+            marginTop: "15px",
+            padding: "10px",
+            borderRadius: "5px",
+            background: message.includes("successful") ? "#d4edda" : "#f8d7da",
+            color: message.includes("successful") ? "#155724" : "#721c24",
+          }}
+        >
+          {message}
+        </p>
+      )}
     </div>
   );
 }

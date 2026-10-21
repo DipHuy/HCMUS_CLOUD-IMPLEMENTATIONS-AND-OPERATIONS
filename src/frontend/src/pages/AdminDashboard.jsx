@@ -10,7 +10,7 @@ export default function AdminDashboard() {
     name: "",
     price: 0,
     stock: 0,
-    image: "",
+    imageUrl: "",
   });
 
   const token = localStorage.getItem("token");
@@ -39,13 +39,13 @@ export default function AdminDashboard() {
     await request(url, method, pForm, {
       Authorization: `Bearer ${token}`,
     });
-    setPForm({ id: null, name: "", price: 0, stock: 0, image: "" });
+    setPForm({ id: null, name: "", price: 0, stock: 0, imageUrl: "" });
     fetchData();
   };
 
   const deleteProduct = async (id) => {
     if (window.confirm("Xóa sản phẩm này?")) {
-      await request("/products/${id}", "DELETE", null, {
+      await request(`/products/${id}`, "DELETE", null, {
         Authorization: `Bearer ${token}`,
       });
       fetchData();
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
   // --- USER CRUD ---
   const handleUpdateUser = async (id, data) => {
     try {
-      await request("/users/${id}", "PATCH", data, {
+      await request(`/users/${id}`, "PATCH", data, {
         Authorization: `Bearer ${token}`,
       });
       fetchData();
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
 
   const deleteUser = async (id) => {
     if (window.confirm("Xóa user này?")) {
-      await request("/users/${id}", "DELETE", null, {
+      await request(`/users/${id}`, "DELETE", null, {
         Authorization: `Bearer ${token}`,
       });
       fetchData();
@@ -120,7 +120,9 @@ export default function AdminDashboard() {
               type="number"
               placeholder="Price"
               value={pForm.price}
-              onChange={(e) => setPForm({ ...pForm, price: e.target.value })}
+              onChange={(e) =>
+                setPForm({ ...pForm, price: parseFloat(e.target.value) || 0 })
+              }
               required
             />
             <input
@@ -133,8 +135,8 @@ export default function AdminDashboard() {
             <input
               type="text"
               placeholder="Image URL"
-              value={pForm.image}
-              onChange={(e) => setPForm({ ...pForm, image: e.target.value })}
+              value={pForm.imageUrl}
+              onChange={(e) => setPForm({ ...pForm, imageUrl: e.target.value })}
             />
             <button
               type="submit"
@@ -150,7 +152,7 @@ export default function AdminDashboard() {
                     name: "",
                     price: 0,
                     stock: 0,
-                    image: "",
+                    imageUrl: "",
                   })
                 }
               >
@@ -163,7 +165,7 @@ export default function AdminDashboard() {
             <thead>
               <tr style={{ background: "#eee" }}>
                 <th>ID</th>
-                <th>Image</th>
+                <th>ImageUrl</th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Stock</th>
@@ -175,7 +177,7 @@ export default function AdminDashboard() {
                 <tr key={p.id}>
                   <td>{p.id}</td>
                   <td>
-                    <img src={p.image} width="50" alt="" />
+                    <img src={p.imageUrl} width="50" alt="" />
                   </td>
                   <td>{p.name}</td>
                   <td>${p.price}</td>

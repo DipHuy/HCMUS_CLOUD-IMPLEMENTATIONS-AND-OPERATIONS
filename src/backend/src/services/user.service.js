@@ -24,7 +24,7 @@ const UserService = {
   },
   updateProfile: async (userId, profileData) => {
     return await writer.user.update({
-      where: { id: userId },
+      where: { id: parseInt(userId) },
       data: profileData,
     });
   },
