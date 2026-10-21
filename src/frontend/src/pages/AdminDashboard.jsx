@@ -165,7 +165,7 @@ export default function AdminDashboard() {
             <thead>
               <tr style={{ background: "#eee" }}>
                 <th>ID</th>
-                <th>ImageUrl</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Stock</th>

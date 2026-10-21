@@ -58,7 +58,7 @@ export default function Home() {
   return (
     <div style={{ padding: "20px" }}>
       <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-        Linh kiện Điện tử
+        ECom - Electronic Components
       </h1>
 
       <div
