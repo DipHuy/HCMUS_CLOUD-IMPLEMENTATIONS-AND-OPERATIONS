@@ -27,7 +27,7 @@ resource "aws_secretsmanager_secret_version" "db_secret_val" {
 resource "aws_rds_cluster" "aurora" {
   cluster_identifier      = "${lower(var.project_name)}-cluster"
   engine                  = "aurora-postgresql"
-  engine_version          = "15.5"
+  engine_version          = "18.4"
   database_name           = var.db_name
   master_username         = var.master_username
   master_password         = "YourSecurePassword123!" 
