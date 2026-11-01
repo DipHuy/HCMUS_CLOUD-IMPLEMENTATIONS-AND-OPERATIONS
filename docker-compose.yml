@@ -22,8 +22,7 @@ services:
       dockerfile: Dockerfile
     container_name: ec_backend
     environment:
-      DATABASE_WRITER_URL: ${DATABASE_WRITER_URL}
-      DATABASE_READER_URL: ${DATABASE_READER_URL}
+      DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       BACKEND_PORT: ${BACKEND_PORT}
       ADMIN_USERNAME: ${ADMIN_USERNAME}
