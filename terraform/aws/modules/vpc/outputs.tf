@@ -25,3 +25,7 @@ output "proxy_sg_id" {
 output "db_sg_id" {
   value = aws_security_group.db_sg.id
 }
+
+output "cache_sg_id" {
+  value = aws_security_group.cache_sg.id
+}

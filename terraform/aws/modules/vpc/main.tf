@@ -63,3 +63,16 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
+
+# SG for Cache
+resource "aws_security_group" "cache_sg" {
+  name   = "${var.project_name}-Cache-Tier-SG"
+  vpc_id = aws_vpc.this.id
+  
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id]
+  }
+}
