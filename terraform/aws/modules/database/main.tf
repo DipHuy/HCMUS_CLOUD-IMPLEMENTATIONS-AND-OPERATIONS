@@ -7,8 +7,10 @@ resource "aws_db_subnet_group" "this" {
 
 # Secrets Manager for Database
 resource "aws_secretsmanager_secret" "db_secret" {
-  name        = "${var.project_name}-db-credentials-v4"
+  name        = "${var.project_name}-db-credentials-"
   description = "Database credentials for Aurora"
+  recovery_window_in_days = 0 # delete immediately when destroy
+  
 }
 
 resource "aws_secretsmanager_secret_version" "db_secret_val" {

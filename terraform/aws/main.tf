@@ -15,3 +15,17 @@ module "database" {
   db_name             = "ecommerce"
   master_username     = "dbadmin"
 }
+
+module "compute" {
+  source            = "./modules/compute"
+  project_name      = "my-ecommerce"
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  app_sg_id         = module.vpc.app_sg_id
+  alb_sg_id         = module.vpc.alb_sg_id
+  db_proxy_endpoint = module.database.db_proxy_endpoint
+  db_name           = module.database.db_name
+  db_username       = module.database.db_username
+  db_password       = module.database.db_password 
+  jwt_secret        = "22127475"
+}
