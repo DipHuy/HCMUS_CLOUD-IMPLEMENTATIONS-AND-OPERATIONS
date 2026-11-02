@@ -19,7 +19,8 @@ output "db_username" {
 }
 
 output "db_password" {
-  value = aws_secretsmanager_secret_version.db_secret_val.secret_string
+  value = jsondecode(aws_secretsmanager_secret_version.db_secret_val.secret_string)["password"]
+  sensitive = true
 }
 
 output "db_secret_arn" {

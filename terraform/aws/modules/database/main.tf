@@ -16,7 +16,7 @@ resource "aws_secretsmanager_secret" "db_secret" {
 resource "aws_secretsmanager_secret_version" "db_secret_val" {
   secret_id     = aws_secretsmanager_secret.db_secret.id
   secret_string = jsonencode({
-    username = var.master_username
+    username = var.db_username
     password = "YourSecurePassword123!"
     engine   = "postgres"
     host     = aws_rds_cluster.aurora.endpoint
@@ -31,8 +31,8 @@ resource "aws_rds_cluster" "aurora" {
   engine                  = "aurora-postgresql"
   engine_version          = "18.4"
   database_name           = var.db_name
-  master_username         = var.master_username
-  master_password         = "YourSecurePassword123!" 
+  master_username         = var.db_username
+  master_password         = var.db_password 
   db_subnet_group_name    = aws_db_subnet_group.this.name
   vpc_security_group_ids  = [var.db_sg_id]
   

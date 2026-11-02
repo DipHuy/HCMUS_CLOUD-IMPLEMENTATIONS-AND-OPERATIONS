@@ -67,6 +67,8 @@ resource "aws_launch_template" "app" {
   name_prefix   = "${var.project_name}-template-"
   image_id      = "ami-01127915c7b29e7ca" 
   instance_type = "t3.micro"
+
+  key_name = var.key_name
   
   network_interfaces {
     associate_public_ip_address = true

@@ -13,7 +13,7 @@ module "database" {
   db_sg_id            = module.vpc.db_sg_id
   proxy_sg_id         = module.vpc.proxy_sg_id
   db_name             = "ecommerce"
-  master_username     = "dbadmin"
+  db_username         = "dbadmin"
 }
 
 module "compute" {
@@ -26,6 +26,6 @@ module "compute" {
   db_proxy_endpoint = module.database.db_proxy_endpoint
   db_name           = module.database.db_name
   db_username       = module.database.db_username
-  db_password       = module.database.db_password 
+  db_password       = module.database.db_password
   jwt_secret        = "22127475"
 }
