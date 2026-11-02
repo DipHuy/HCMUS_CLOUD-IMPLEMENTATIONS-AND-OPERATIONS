@@ -67,7 +67,7 @@ chmod -R 755 $PROJECT_ROOT/src/frontend/dist
 
 sudo sed -i \
   -e 's|/usr/share/nginx/html|/home/ec2-user/app/src/frontend/dist|g' \
-  -e 's|http://backend:3000/|http://localhost:3000/|g' \
+  -e 's|http://backend:3000|http://localhost:3000|g' \
   $PROJECT_ROOT/src/frontend/nginx.conf
 
 cp $PROJECT_ROOT/src/frontend/nginx.conf /etc/nginx/conf.d/ecommerce.conf
