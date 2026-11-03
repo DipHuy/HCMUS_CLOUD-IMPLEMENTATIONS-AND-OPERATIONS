@@ -75,6 +75,10 @@ resource "aws_launch_template" "app" {
     security_groups             = [var.app_sg_id]
   }
 
+  iam_instance_profile {
+    name = var.iam_instance_profile_name
+  }
+
   # Script auto run app
   user_data = base64encode(templatefile("${path.module}/userdata.sh", {
     DATABASE_URL      = "postgresql://${var.db_username}:${var.db_password}@${var.db_proxy_endpoint}:5432/${var.db_name}?schema=public",

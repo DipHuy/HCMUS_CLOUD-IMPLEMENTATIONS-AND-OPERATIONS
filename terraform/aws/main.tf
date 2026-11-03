@@ -71,20 +71,20 @@ resource "aws_iam_instance_profile" "app_instance_profile" {
 
 
 module "compute" {
-  source            = "./modules/compute"
-  depends_on        = [module.database, module.storage]
-  project_name      = var.project_name
-  vpc_id            = module.vpc.vpc_id
-  public_subnet_ids = module.vpc.public_subnet_ids
-  app_sg_id         = module.vpc.app_sg_id
-  alb_sg_id         = module.vpc.alb_sg_id
-  db_proxy_endpoint = module.database.db_proxy_endpoint
-  db_name           = module.database.db_name
-  db_username       = module.database.db_username
-  db_password       = module.database.db_password
-  jwt_secret        = var.JWT_SECRET
-  s3_bucket_id      = module.storage.s3_bucket_id
-  cloudfront_domain = module.storage.cloudfront_domain
-  aws_region        = var.aws_region
-
+  source                    = "./modules/compute"
+  depends_on                = [module.database, module.storage]
+  project_name              = var.project_name
+  vpc_id                    = module.vpc.vpc_id
+  public_subnet_ids         = module.vpc.public_subnet_ids
+  app_sg_id                 = module.vpc.app_sg_id
+  alb_sg_id                 = module.vpc.alb_sg_id
+  db_proxy_endpoint         = module.database.db_proxy_endpoint
+  db_name                   = module.database.db_name
+  db_username               = module.database.db_username
+  db_password               = module.database.db_password
+  jwt_secret                = var.JWT_SECRET
+  s3_bucket_id              = module.storage.s3_bucket_id
+  cloudfront_domain         = module.storage.cloudfront_domain
+  aws_region                = var.aws_region
+  iam_instance_profile_name = aws_iam_instance_profile.app_instance_profile.name
 }
