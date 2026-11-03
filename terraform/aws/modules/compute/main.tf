@@ -77,16 +77,17 @@ resource "aws_launch_template" "app" {
 
   # Script auto run app
   user_data = base64encode(templatefile("${path.module}/userdata.sh", {
-    DATABASE_URL   = "postgresql://${var.db_username}:${var.db_password}@${var.db_proxy_endpoint}:5432/${var.db_name}?schema=public",
-    BACKEND_PORT   = var.backend_port,
-    FRONTEND_PORT  = var.frontend_port,
-    JWT_SECRET     = var.jwt_secret,
-    VITE_API_URL   = "http://${aws_lb.alb.dns_name}/api" 
-    ADMIN_USERNAME = "admin"
-    ADMIN_PASSWORD = "admin123"
-    AWS_REGION     = var.aws_region
-    S3_BUCKET_NAME = var.s3_bucket_id
+    DATABASE_URL      = "postgresql://${var.db_username}:${var.db_password}@${var.db_proxy_endpoint}:5432/${var.db_name}?schema=public",
+    BACKEND_PORT      = var.backend_port,
+    FRONTEND_PORT     = var.frontend_port,
+    JWT_SECRET        = var.jwt_secret,
+    VITE_API_URL      = "http://${aws_lb.alb.dns_name}/api" 
+    ADMIN_USERNAME    = "admin"
+    ADMIN_PASSWORD    = "admin123"
+    AWS_REGION        = var.aws_region
+    S3_BUCKET_NAME    = var.s3_bucket_id
     CLOUDFRONT_DOMAIN = var.cloudfront_domain
+    CLOUD_PROVIDER    = "AWS"
   }))
 
   tag_specifications {
@@ -98,9 +99,9 @@ resource "aws_launch_template" "app" {
 # Auto Scaling Group
 resource "aws_autoscaling_group" "asg" {
   name                = "${var.project_name}-asg"
-  min_size            = 2
+  min_size            = 1
   max_size            = 4
-  desired_capacity    = 2
+  desired_capacity    = 1
   vpc_zone_identifier = var.public_subnet_ids
   
   target_group_arns = [
