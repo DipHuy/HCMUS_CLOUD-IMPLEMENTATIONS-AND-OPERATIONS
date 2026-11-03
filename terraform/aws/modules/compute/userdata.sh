@@ -2,6 +2,7 @@
 dnf update -y
 dnf install -y git nginx nc
 
+
 # Install npm
 sudo dnf install libatomic -y
 curl -sL https://rpm.nodesource.com/setup_26.x | bash -
@@ -13,6 +14,7 @@ npm install -g pm2
 # Clone repo
 PROJECT_ROOT="/home/ec2-user/app"
 git clone https://github.com/DipHuy/HCMUS_CLOUD-IMPLEMENTATIONS-AND-OPERATIONS.git -b feature/create-terraform-aws $PROJECT_ROOT
+
 
 # Setup ENV files
 cd $PROJECT_ROOT
@@ -26,6 +28,7 @@ ADMIN_USERNAME=${ADMIN_USERNAME}
 ADMIN_PASSWORD=${ADMIN_PASSWORD}
 VITE_API_URL=${VITE_API_URL}
 EOF
+
 
 # Setup backend
 cd $PROJECT_ROOT/src/backend
@@ -41,10 +44,6 @@ CLOUDFRONT_DOMAIN=${CLOUDFRONT_DOMAIN}
 AWS_REGION=${AWS_REGION}
 CLOUD_PROVIDER=${CLOUD_PROVIDER}
 EOF
-
-
-
-
 
 npm install
 
@@ -63,15 +62,15 @@ while ! nc -z $DB_HOST 5432; do
   fi
 done
 
-
 npx prisma generate
 npx prisma db seed
-
 npx prisma db push --accept-data-loss
 
+# Start backend with pm2
 pm2 delete backend || true
 pm2 start src/index.js --name backend
 pm2 save
+
 
 # Setup frontend
 cd $PROJECT_ROOT/src/frontend
@@ -79,24 +78,26 @@ cd $PROJECT_ROOT/src/frontend
 cat <<EOF > .env
 VITE_API_URL=${VITE_API_URL}
 FRONTEND_PORT=${FRONTEND_PORT}
+BACKEND_PORT=${BACKEND_PORT}
 EOF
 
 npm install
 npm run build
 
-## Setup nginx
-# Add perm for nginx access dist folder
+
+# Setup nginx
+## Add perm for nginx access dist folder
 chmod 755 /home/ec2-user
 chmod -R 755 $PROJECT_ROOT/src/frontend/dist
 
+## Update nginx config
 sudo sed -i \
   -e 's|/usr/share/nginx/html|/home/ec2-user/app/src/frontend/dist|g' \
-  -e 's|http://backend:3000|http://localhost:3000|g' \
+  -e 's|http://backend:${BACKEND_PORT}|http://localhost:${BACKEND_PORT}|g' \
   $PROJECT_ROOT/src/frontend/nginx.conf
 
 cp $PROJECT_ROOT/src/frontend/nginx.conf /etc/nginx/conf.d/ecommerce.conf
 
-
+## Start nginx
 systemctl enable nginx
 systemctl restart nginx
-
