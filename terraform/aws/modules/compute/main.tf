@@ -77,13 +77,16 @@ resource "aws_launch_template" "app" {
 
   # Script auto run app
   user_data = base64encode(templatefile("${path.module}/userdata.sh", {
-    DATABASE_URL = "postgresql://${var.db_username}:${var.db_password}@${var.db_proxy_endpoint}:5432/${var.db_name}?schema=public",
-    BACKEND_PORT = var.backend_port,
-    FRONTEND_PORT = var.frontend_port,
-    JWT_SECRET = var.jwt_secret,
-    VITE_API_URL = "http://${aws_lb.alb.dns_name}/api" 
+    DATABASE_URL   = "postgresql://${var.db_username}:${var.db_password}@${var.db_proxy_endpoint}:5432/${var.db_name}?schema=public",
+    BACKEND_PORT   = var.backend_port,
+    FRONTEND_PORT  = var.frontend_port,
+    JWT_SECRET     = var.jwt_secret,
+    VITE_API_URL   = "http://${aws_lb.alb.dns_name}/api" 
     ADMIN_USERNAME = "admin"
     ADMIN_PASSWORD = "admin123"
+    AWS_REGION     = var.aws_region
+    S3_BUCKET_NAME = var.s3_bucket_id
+    CLOUDFRONT_DOMAIN = var.cloudfront_domain
   }))
 
   tag_specifications {

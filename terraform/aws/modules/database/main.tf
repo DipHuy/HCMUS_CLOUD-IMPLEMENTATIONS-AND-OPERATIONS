@@ -17,7 +17,7 @@ resource "aws_secretsmanager_secret_version" "db_secret_val" {
   secret_id     = aws_secretsmanager_secret.db_secret.id
   secret_string = jsonencode({
     username = var.db_username
-    password = "YourSecurePassword123!"
+    password = var.db_password
     engine   = "postgres"
     host     = aws_rds_cluster.aurora.endpoint
     port     = 5432
@@ -39,6 +39,7 @@ resource "aws_rds_cluster" "aurora" {
   storage_encrypted       = true
   apply_immediately       = true
   skip_final_snapshot     = true 
+  deletion_protection     = false
 
   tags = { Name = "${var.project_name}-Aurora-Cluster" }
 }

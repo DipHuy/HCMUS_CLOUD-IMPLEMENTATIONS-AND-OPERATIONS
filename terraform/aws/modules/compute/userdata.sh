@@ -1,6 +1,6 @@
 #!/bin/bash
 dnf update -y
-dnf install -y git nginx 
+dnf install -y git nginx nc
 
 # Install npm
 sudo dnf install libatomic -y
@@ -36,14 +36,37 @@ BACKEND_PORT=${BACKEND_PORT}
 ADMIN_USERNAME=${ADMIN_USERNAME}
 ADMIN_PASSWORD=${ADMIN_PASSWORD}
 VITE_API_URL=${VITE_API_URL}
+S3_BUCKET_NAME=${S3_BUCKET_NAME}
+CLOUDFRONT_DOMAIN=${CLOUDFRONT_DOMAIN}
+AWS_REGION=${AWS_REGION}
 EOF
 
 
 
-npm install
-npx prisma generate
 
-npx prisma db push 
+
+npm install
+
+# Connect database
+DB_HOST=$(echo "${DATABASE_URL}" | sed -e 's|.*@||' -e 's|:.*||')
+
+MAX_RETRIES=5
+TIMEOUT=10
+COUNT=0
+while ! nc -z $DB_HOST 5432; do
+  echo "Database is not ready yet... (Attempt $COUNT/$MAX_RETRIES)"
+  sleep $TIMEOUT
+  COUNT=$((COUNT + 1))
+  if [ $COUNT -ge $MAX_RETRIES ]; then
+    echo "Timeout: Database took too long to start."
+  fi
+done
+
+
+npx prisma generate
+npx prisma db seed
+
+npx prisma db push --accept-data-loss
 
 pm2 delete backend || true
 pm2 start src/index.js --name backend

@@ -10,6 +10,9 @@ variable "frontend_port"       { default = 80 }
 variable "db_name"             { type = string }
 variable "db_username"     { type = string }
 variable "db_password"     { type = string }
+variable "s3_bucket_id"        { type = string }
+variable "cloudfront_domain" { type = string }
+variable "aws_region"          { type = string }
 
 variable "key_name" {
   type        = string

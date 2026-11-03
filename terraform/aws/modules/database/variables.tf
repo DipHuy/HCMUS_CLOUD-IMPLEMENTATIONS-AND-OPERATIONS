@@ -5,4 +5,4 @@ variable "db_sg_id"            { type = string }
 variable "proxy_sg_id"         { type = string }
 variable "db_name"             { default = "ecommerce" }
 variable "db_username"     { default = "dbadmin" }
-variable "db_password"     { default = "YourSecurePassword123!" }
+variable "db_password"     { default = "YourSecurePassword123" }

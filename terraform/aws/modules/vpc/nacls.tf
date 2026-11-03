@@ -33,6 +33,15 @@ resource "aws_network_acl" "public" {
     to_port    = 65535
   }
 
+  ingress {
+    protocol   = "6" # TCP
+    rule_no    = 121
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 22
+    to_port    = 22
+  }
+
   egress {
     protocol   = "-1"
     rule_no    = 100
