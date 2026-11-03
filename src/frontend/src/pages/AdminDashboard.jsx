@@ -47,9 +47,16 @@ export default function AdminDashboard() {
     const url = pForm.id ? `/products/${pForm.id}` : "/products";
 
     try {
-      const response = await request(url, method, formData, {
-        Authorization: `Bearer ${token}`,
-      });
+      const response = await await fetch(
+        `${import.meta.env.VITE_API_URL}${url}`,
+        {
+          method: method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        },
+      );
 
       if (response.ok) {
         setPForm({ id: null, name: "", price: "", stock: "", description: "" });
@@ -85,7 +92,7 @@ export default function AdminDashboard() {
   };
 
   const deleteUser = async (id) => {
-    if (window.confirm("Xóa user này?")) {
+    if (window.confirm("Delete this user?")) {
       await request(`/users/${id}`, "DELETE", null, {
         Authorization: `Bearer ${token}`,
       });
@@ -181,7 +188,7 @@ export default function AdminDashboard() {
                     name: "",
                     price: 0,
                     stock: 0,
-                    imageUrl: "",
+                    image: "",
                   })
                 }
               >
@@ -207,7 +214,7 @@ export default function AdminDashboard() {
                 <tr key={p.id}>
                   <td>{p.id}</td>
                   <td>
-                    <img src={p.imageUrl} width="50" alt="" />
+                    <img src={p.image} width="50" alt="" />
                   </td>
                   <td>{p.name}</td>
                   <td>{p.description}</td>

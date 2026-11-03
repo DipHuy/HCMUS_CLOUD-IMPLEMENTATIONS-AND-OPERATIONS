@@ -59,7 +59,7 @@ router.put(
   async (req, res) => {
     try {
       const { name, price, stock, description } = req.body;
-      let imageUrl = req.body.imageUrl;
+      let imageUrl = req.body.image;
 
       if (req.file) {
         imageUrl = await storageProvider.uploadFile(req.file);
