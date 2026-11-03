@@ -6,7 +6,8 @@ const serialize = (product) =>
     name: product.name,
     price: product.price,
     stock: product.stock,
-    imageUrl: product.imageUrl || "",
+    description: product.description || "No description",
+    image: product.image || "",
   };
 
 const ProductService = {
@@ -24,7 +25,8 @@ const ProductService = {
           name: data.name,
           price: parseFloat(data.price),
           stock: parseInt(data.stock),
-          imageUrl: data.image ?? data.imageUrl ?? "",
+          description: data.description || "No description",
+          image: data.image ?? "",
         },
       })
       .then(serialize);
@@ -36,9 +38,10 @@ const ProductService = {
         where: { id: parseInt(id) },
         data: {
           name: data.name,
-          price: parseFloat(data.price),
-          stock: parseInt(data.stock),
-          imageUrl: data.imageUrl ?? "",
+          price: parseFloat(data.price) || 0,
+          stock: parseInt(data.stock) || 0,
+          description: data.description || "No description",
+          image: data.image ?? "",
         },
       })
       .then(serialize),

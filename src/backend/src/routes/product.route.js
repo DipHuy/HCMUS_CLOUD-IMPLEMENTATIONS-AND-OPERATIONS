@@ -32,7 +32,7 @@ router.get("/:id", async (req, res) => {
 // create, update, delete products (admin only)
 router.post("/", upload.single("image"), auth(["ADMIN"]), async (req, res) => {
   try {
-    const { name, description, price, stock } = req.body;
+    const { name, price, stock, description } = req.body;
     let imageUrl = "";
 
     if (req.file) {
@@ -40,10 +40,10 @@ router.post("/", upload.single("image"), auth(["ADMIN"]), async (req, res) => {
     }
 
     const newProduct = {
-      name,
-      description: description || "No description",
+      name: name,
       price: parseFloat(price),
       stock: parseInt(stock),
+      description: description || "No description",
       image: imageUrl,
     };
     res.json(await ProductService.create(newProduct));
@@ -58,7 +58,7 @@ router.put(
   auth(["ADMIN"]),
   async (req, res) => {
     try {
-      const { name, description, price, stock } = req.body;
+      const { name, price, stock, description } = req.body;
       let imageUrl = req.body.imageUrl;
 
       if (req.file) {
@@ -66,10 +66,10 @@ router.put(
       }
 
       const updatedProduct = {
-        name,
+        name: name,
+        price: parseFloat(price) || 0,
+        stock: parseInt(stock) || 0,
         description: description || "No description",
-        price: parseFloat(price),
-        stock: parseInt(stock),
         image: imageUrl,
       };
       res.json(await ProductService.update(req.params.id, updatedProduct));
