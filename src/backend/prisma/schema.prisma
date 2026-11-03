@@ -24,6 +24,7 @@ model User {
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
+  description String? @default("No Description")
   price       Float
   imageUrl    String?
   stock       Int
