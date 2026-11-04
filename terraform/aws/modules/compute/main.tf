@@ -103,9 +103,9 @@ resource "aws_launch_template" "app" {
 # Auto Scaling Group
 resource "aws_autoscaling_group" "asg" {
   name                = "${var.project_name}-asg"
-  min_size            = 1
+  min_size            = 2
   max_size            = 4
-  desired_capacity    = 1
+  desired_capacity    = 2
   vpc_zone_identifier = var.public_subnet_ids
   
   target_group_arns = [
