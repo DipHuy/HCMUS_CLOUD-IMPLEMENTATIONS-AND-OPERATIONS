@@ -1,4 +1,4 @@
-const { writer, reader } = require("./db.service");
+const { dbclient } = require("./db.service");
 
 const OrderService = {
   createOrder: async (userId, cartItems) => {
@@ -8,7 +8,7 @@ const OrderService = {
     );
 
     // Use transaction to ensure atomicity
-    return await writer.$transaction(async (tx) => {
+    return await dbclient.$transaction(async (tx) => {
       const order = await tx.order.create({
         data: {
           userId: userId,
@@ -37,7 +37,7 @@ const OrderService = {
   },
 
   getUserOrders: (userId) => {
-    return reader.order.findMany({
+    return dbclient.order.findMany({
       where: { userId: userId },
       include: {
         items: {
@@ -49,7 +49,7 @@ const OrderService = {
   },
 
   getAllOrders: () => {
-    return reader.order.findMany({
+    return dbclient.order.findMany({
       include: {
         user: { select: { username: true } },
         items: true,
@@ -59,7 +59,7 @@ const OrderService = {
   },
 
   updateStatus: (orderId, status) => {
-    return writer.order.update({
+    return dbclient.order.update({
       where: { id: parseInt(orderId) },
       data: { status: status },
     });

@@ -5,12 +5,13 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("products");
   const [products, setProducts] = useState([]);
   const [users, setUsers] = useState([]);
+  const [imageFile, setImageFile] = useState(null);
   const [pForm, setPForm] = useState({
     id: null,
     name: "",
-    price: 0,
-    stock: 0,
-    imageUrl: "",
+    price: "",
+    stock: "",
+    description: "",
   });
 
   const token = localStorage.getItem("token");
@@ -33,18 +34,44 @@ export default function AdminDashboard() {
   // --- PRODUCT CRUD ---
   const saveProduct = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", pForm.name);
+    formData.append("price", pForm.price);
+    formData.append("stock", pForm.stock);
+    formData.append("description", pForm.description || "No description");
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
     const method = pForm.id ? "PUT" : "POST";
     const url = pForm.id ? `/products/${pForm.id}` : "/products";
 
-    await request(url, method, pForm, {
-      Authorization: `Bearer ${token}`,
-    });
-    setPForm({ id: null, name: "", price: 0, stock: 0, imageUrl: "" });
-    fetchData();
+    try {
+      const response = await await fetch(
+        `${import.meta.env.VITE_API_URL}${url}`,
+        {
+          method: method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        },
+      );
+
+      if (response.ok) {
+        setPForm({ id: null, name: "", price: "", stock: "", description: "" });
+        setImageFile(null);
+        document.getElementById("imageInput").value = "";
+        e.target.reset();
+        fetchData();
+      }
+    } catch (error) {
+      alert("Error saving product");
+    }
   };
 
   const deleteProduct = async (id) => {
-    if (window.confirm("Xóa sản phẩm này?")) {
+    if (window.confirm("Delete this product?")) {
       await request(`/products/${id}`, "DELETE", null, {
         Authorization: `Bearer ${token}`,
       });
@@ -65,7 +92,7 @@ export default function AdminDashboard() {
   };
 
   const deleteUser = async (id) => {
-    if (window.confirm("Xóa user này?")) {
+    if (window.confirm("Delete this user?")) {
       await request(`/users/${id}`, "DELETE", null, {
         Authorization: `Bearer ${token}`,
       });
@@ -116,9 +143,10 @@ export default function AdminDashboard() {
               onChange={(e) => setPForm({ ...pForm, name: e.target.value })}
               required
             />
+
             <input
               type="number"
-              placeholder="Price"
+              placeholder="Price ($)"
               value={pForm.price}
               onChange={(e) =>
                 setPForm({ ...pForm, price: parseFloat(e.target.value) || 0 })
@@ -133,10 +161,18 @@ export default function AdminDashboard() {
               required
             />
             <input
-              type="text"
-              placeholder="Image URL"
-              value={pForm.imageUrl}
-              onChange={(e) => setPForm({ ...pForm, imageUrl: e.target.value })}
+              id="imageInput"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files[0])}
+            />
+            <textarea
+              placeholder="Description"
+              style={{ gridColumn: "span 2", padding: "10px" }}
+              value={pForm.description}
+              onChange={(e) =>
+                setPForm({ ...pForm, description: e.target.value })
+              }
             />
             <button
               type="submit"
@@ -152,7 +188,7 @@ export default function AdminDashboard() {
                     name: "",
                     price: 0,
                     stock: 0,
-                    imageUrl: "",
+                    image: "",
                   })
                 }
               >
@@ -167,6 +203,7 @@ export default function AdminDashboard() {
                 <th>ID</th>
                 <th>Image</th>
                 <th>Name</th>
+                <th>Description</th>
                 <th>Price</th>
                 <th>Stock</th>
                 <th>Actions</th>
@@ -177,9 +214,10 @@ export default function AdminDashboard() {
                 <tr key={p.id}>
                   <td>{p.id}</td>
                   <td>
-                    <img src={p.imageUrl} width="50" alt="" />
+                    <img src={p.image} width="50" alt="" />
                   </td>
                   <td>{p.name}</td>
+                  <td>{p.description}</td>
                   <td>${p.price}</td>
                   <td>{p.stock}</td>
                   <td>

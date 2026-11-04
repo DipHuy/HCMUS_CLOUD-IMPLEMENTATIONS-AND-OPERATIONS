@@ -1,4 +1,4 @@
-const { writer, reader } = require("./db.service");
+const { dbclient } = require("./db.service");
 
 const serialize = (product) =>
   product && {
@@ -6,41 +6,46 @@ const serialize = (product) =>
     name: product.name,
     price: product.price,
     stock: product.stock,
-    imageUrl: product.imageUrl || "",
+    description: product.description || "No description",
+    image: product.image || "",
   };
 
 const ProductService = {
-  getAll: async () => (await reader.product.findMany()).map(serialize),
+  getAll: async () => (await dbclient.product.findMany()).map(serialize),
 
   getById: async (id) =>
-    serialize(await reader.product.findUnique({ where: { id: parseInt(id) } })),
+    serialize(
+      await dbclient.product.findUnique({ where: { id: parseInt(id) } }),
+    ),
 
   create: (data) => {
-    return writer.product
+    return dbclient.product
       .create({
         data: {
           name: data.name,
           price: parseFloat(data.price),
           stock: parseInt(data.stock),
-          imageUrl: data.image ?? data.imageUrl ?? "",
+          description: data.description || "No description",
+          image: data.image ?? "",
         },
       })
       .then(serialize);
   },
 
   update: (id, data) =>
-    writer.product
+    dbclient.product
       .update({
         where: { id: parseInt(id) },
         data: {
           name: data.name,
-          price: parseFloat(data.price),
-          stock: parseInt(data.stock),
-          imageUrl: data.imageUrl ?? "",
+          price: parseFloat(data.price) || 0,
+          stock: parseInt(data.stock) || 0,
+          description: data.description || "No description",
+          image: data.image ?? "",
         },
       })
       .then(serialize),
 
-  delete: (id) => writer.product.delete({ where: { id: parseInt(id) } }),
+  delete: (id) => dbclient.product.delete({ where: { id: parseInt(id) } }),
 };
 module.exports = ProductService;

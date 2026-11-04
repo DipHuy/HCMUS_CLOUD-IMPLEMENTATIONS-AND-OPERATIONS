@@ -16,11 +16,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use("/auth", authRoutes);
-app.use("/products", productRoutes);
-app.use("/orders", orderRoutes);
-app.use("/users", userRoutes);
-app.get("/health", (req, res) => res.status(200).json({ message: "OK" }));
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/users", userRoutes);
+app.get("/api/health", (req, res) => res.status(200).json({ message: "OK" }));
 
 const BACKEND_PORT = process.env.BACKEND_PORT;
 app.listen(BACKEND_PORT, () =>

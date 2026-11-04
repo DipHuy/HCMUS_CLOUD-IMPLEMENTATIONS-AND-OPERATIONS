@@ -1,29 +1,29 @@
-const { writer, reader } = require("./db.service");
+const { dbclient } = require("./db.service");
 const bcrypt = require("bcryptjs");
 
 const UserService = {
-  getAll: () => reader.user.findMany(),
-  getById: (id) => reader.user.findUnique({ where: { id: parseInt(id) } }),
+  getAll: () => dbclient.user.findMany(),
+  getById: (id) => dbclient.user.findUnique({ where: { id: parseInt(id) } }),
   update: (id, data) =>
-    writer.user.update({
+    dbclient.user.update({
       where: { id: parseInt(id) },
       data: {
         username: data.username,
         address: data.address,
       },
     }),
-  delete: (id) => writer.user.delete({ where: { id: parseInt(id) } }),
+  delete: (id) => dbclient.user.delete({ where: { id: parseInt(id) } }),
   register: async (username, password, role = "USER") => {
     const hashedPassword = await bcrypt.hash(password, 10);
-    return await writer.user.create({
+    return await dbclient.user.create({
       data: { username, password: hashedPassword, role },
     });
   },
   findByUsername: (username) => {
-    return reader.user.findUnique({ where: { username } });
+    return dbclient.user.findUnique({ where: { username } });
   },
   updateProfile: async (userId, profileData) => {
-    return await writer.user.update({
+    return await dbclient.user.update({
       where: { id: parseInt(userId) },
       data: profileData,
     });

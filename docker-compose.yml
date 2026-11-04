@@ -7,12 +7,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES_DB}"]
       interval: 3s
       timeout: 3s
       retries: 3
     ports:
-      - "5432:5432"
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/18/docker
 
@@ -22,15 +22,16 @@ services:
       dockerfile: Dockerfile
     container_name: ec_backend
     environment:
-      DATABASE_WRITER_URL: ${DATABASE_WRITER_URL}
-      DATABASE_READER_URL: ${DATABASE_READER_URL}
+      DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       BACKEND_PORT: ${BACKEND_PORT}
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       VITE_API_URL: ${VITE_API_URL}
+      CLOUD_PROVIDER: AWS
+
     ports:
-      - "3000:3000"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     depends_on:
       db:
         condition: service_healthy
@@ -44,8 +45,11 @@ services:
       args:
         - VITE_API_URL=${VITE_API_URL}
     container_name: ec_frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+      FRONTEND_PORT: ${FRONTEND_PORT}
     ports:
-      - "80:80"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     depends_on:
       - backend
 
