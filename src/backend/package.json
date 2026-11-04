@@ -3,13 +3,9 @@
   "version": "1.0.0",
   "description": "Node.js Backend for E-commerce on AWS",
   "main": "src/index.js",
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "postinstall": "npx prisma generate"
+    "dev": "nodemon src/index.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1161.0",

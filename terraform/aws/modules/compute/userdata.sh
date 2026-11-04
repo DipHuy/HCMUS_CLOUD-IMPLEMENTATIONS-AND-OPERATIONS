@@ -49,8 +49,9 @@ npm install
 
 # Connect database
 npx prisma generate
-npx prisma db seed
-npx prisma db push --accept-data-loss
+npx prisma db push --accept-data-loss --skip-generate
+
+node prisma/seed.js
 
 # Start backend with pm2
 pm2 delete backend || true
