@@ -92,6 +92,7 @@ resource "aws_launch_template" "app" {
     S3_BUCKET_NAME    = var.s3_bucket_id
     CLOUDFRONT_DOMAIN = var.cloudfront_domain
     CLOUD_PROVIDER    = "AWS"
+    CACHE_ENDPOINT    = var.cache_endpoint
   }))
 
   tag_specifications {
