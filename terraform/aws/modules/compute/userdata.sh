@@ -1,6 +1,6 @@
 #!/bin/bash
 dnf update -y
-dnf install -y git nginx nc
+dnf install -y git nginx nc postgresql18
 
 
 # Install npm
@@ -48,20 +48,6 @@ EOF
 npm install
 
 # Connect database
-DB_HOST=$(echo "${DATABASE_URL}" | sed -e 's|.*@||' -e 's|:.*||')
-
-MAX_RETRIES=5
-TIMEOUT=10
-COUNT=0
-while ! nc -z $DB_HOST 5432; do
-  echo "Database is not ready yet... (Attempt $COUNT/$MAX_RETRIES)"
-  sleep $TIMEOUT
-  COUNT=$((COUNT + 1))
-  if [ $COUNT -ge $MAX_RETRIES ]; then
-    echo "Timeout: Database took too long to start."
-  fi
-done
-
 npx prisma generate
 npx prisma db seed
 npx prisma db push --accept-data-loss

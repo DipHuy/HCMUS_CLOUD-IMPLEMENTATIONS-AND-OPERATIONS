@@ -6,7 +6,8 @@ resource "random_string" "suffix" {
 }
 
 resource "aws_s3_bucket" "assets" {
-  bucket = "${lower(var.project_name)}-assets-${random_string.suffix.result}"
+  bucket        = "${lower(var.project_name)}-assets-${random_string.suffix.result}"
+  force_destroy = true
 }
 
 # CloudFront Origin Access Control (OAC)

@@ -69,10 +69,14 @@ resource "aws_iam_instance_profile" "app_instance_profile" {
 }
 
 
+resource "time_sleep" "wait_for_db_ready" {
+  depends_on = [module.database]
+  create_duration = "3m"
+}
 
 module "compute" {
   source                    = "./modules/compute"
-  depends_on                = [module.database, module.storage]
+  depends_on                = [time_sleep.wait_for_db_ready]
   project_name              = var.project_name
   vpc_id                    = module.vpc.vpc_id
   public_subnet_ids         = module.vpc.public_subnet_ids
