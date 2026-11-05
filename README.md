@@ -1,8 +1,148 @@
 # [HCMUS][CSC11006] HCMUS_CLOUD-IMPLEMENTATIONS-AND-OPERATIONS Deploying a Highly Available & Scalable E-commerce Platform on AWS
 
+## Table of Content
+
+<!-- toc -->
+
+- [1. Project Overview](#1-project-overview)
+  * [1.1 Project Structure](#11-project-structure)
+  * [1.2 How to run](#12-how-to-run)
+    + [1.2.1 Create AWS account](#121-create-aws-account)
+    + [1.2.2 Create Terraform account](#122-create-terraform-account)
+    + [1.2.3 Deploy infrastructure](#123-deploy-infrastructure)
+- [2. Implementation Details](#2-implementation-details)
+  * [2.1 Network Infrastructure](#21-network-infrastructure)
+  * [2.1.1 VPC](#211-vpc)
+    + [2.1.1.1 resource aws_vpc](#2111-resource-aws_vpc)
+    + [2.1.1.2 resource aws_subnet](#2112-resource-aws_subnet)
+    + [2.1.1.3 resource aws_internet_gateway](#2113-resource-aws_internet_gateway)
+    + [2.1.1.4 resource aws_route_table](#2114-resource-aws_route_table)
+    + [2.1.1.5 resource aws_route_table_association](#2115-resource-aws_route_table_association)
+    + [2.1.1.6 resource aws_security_group](#2116-resource-aws_security_group)
+  * [2.1.2 Network Access Control Lists (NACLs)](#212-network-access-control-lists-nacls)
+  * [2.2 E-commerce Application Hosting (Amazon EC2, ELB, Auto Scaling)](#22-e-commerce-application-hosting-amazon-ec2-elb-auto-scaling)
+    + [2.2.1 Load balancing Infrastructure](#221-load-balancing-infrastructure)
+      - [2.2.1.1 aws_lb_target_group](#2211-aws_lb_target_group)
+      - [2.2.1.2 aws_lb](#2212-aws_lb)
+    + [2.2.2 Compute and application deployment](#222-compute-and-application-deployment)
+      - [2.2.2.1 aws_launch_template](#2221-aws_launch_template)
+      - [2.2.2.2 Auto Scaling group](#2222-auto-scaling-group)
+  * [2.3 Database Tier (Amazon Aurora & RDS Proxy)](#23-database-tier-amazon-aurora--rds-proxy)
+    + [2.3.1 Networking and Security Prerequisites](#231-networking-and-security-prerequisites)
+  * [2.3.2 Secure Credential Management](#232-secure-credential-management)
+  * [2.3.3 Amazon Aurora PostgreSQL Cluster](#233-amazon-aurora-postgresql-cluster)
+    + [2.3.3.1 aws_rds_cluster](#2331-aws_rds_cluster)
+    + [2.3.3.2 aws_rds_cluster_instance](#2332-aws_rds_cluster_instance)
+  * [2.3.4 RDS Proxy](#234-rds-proxy)
+    + [2.3.4.1 proxy_role (IAM role)](#2341-proxy_role-iam-role)
+    + [2.3.4.2 aws_db_proxy](#2342-aws_db_proxy)
+  * [2.4 Database Caching Layer](#24-database-caching-layer)
+    + [2.4.1 aws_elasticache_subnet_group](#241-aws_elasticache_subnet_group)
+    + [2.4.2 aws_elasticache_replication_group](#242-aws_elasticache_replication_group)
+- [3. Test Result](#3-test-result)
+
+<!-- tocstop -->
+
 ## 1. Project Overview
 
 The project will deploy a multi-tier e-commerce platform (a sample Nodejs e-commerce platform). The focus will be on the infrastructure setup, automation, monitoring, and operational best practices.
+
+### 1.1 Project Structure
+
+```text
+.
+├── src/
+│   ├── backend/         # Node.js API with Prisma
+│   └── frontend/        # React Application
+├── terraform/
+│   └── aws/
+│       ├── modules/
+│       │   ├── vpc/      # Networking & Security
+│       │   ├── database/ # Aurora & RDS Proxy
+│       │   ├── cache/    # ElastiCache
+│       │   └── compute/  # ALB, ASG & Launch Template
+│       └── main.tf       # Root configuration
+└── README.md
+```
+
+### 1.2 How to run
+
+#### 1.2.1 Create AWS account
+
+Clone this repo
+
+```
+git clone https://github.com/DipHuy/HCMUS_CLOUD-IMPLEMENTATIONS-AND-OPERATIONS.git -b main
+```
+
+Create AWS account at https://aws.amazon.com/
+
+Create user with appropriate permisson and create access key
+![](docs/terraforn/iam.png)
+![](docs/terraforn/iam1.png)
+
+Go to `terraform/aws` and export your access key
+
+```
+export AWS_ACCESS_KEY_ID="your access key id"
+export AWS_SECRET_ACCESS_KEY="your secret access key"
+```
+
+#### 1.2.2 Create Terraform account
+
+Access [HCP Terraform - https://app.terraform.io/app](https://app.terraform.io/app) and create an account, organization and workspace.
+![HCP Terraform](./docs/terraforn/hcp-tf.png)
+
+Go to `terraform/aws` and run
+
+```
+terraform login
+```
+
+At `terraform/aws/providers.tf` replace backend block with your organization and workspace.
+
+```
+cloud {
+    organization = "Your organization"
+    workspaces {
+      name = "your workspace"
+    }
+  }
+```
+
+#### 1.2.3 Deploy infrastructure
+
+To initial terraform project run:
+
+```
+terraform init
+```
+
+To verify which infrastructure will be create run:
+
+```
+terraform plan
+```
+
+To create infrastructure run:
+
+```
+terraform apply
+```
+
+then type `yes`
+
+or run
+
+```
+terraform apply -auto-approve
+```
+
+To destroy infrastructure:
+
+```
+terraform destroy -auto-approve
+```
 
 ## 2. Implementation Details
 
@@ -182,21 +322,3 @@ The replication group resource type is utilized as it is the modern and flexible
   - Configuration Rationale: This configuration uses the standard, AWS-managed parameter group for Valkey 8.0. This group contains settings that are pre-optimized for general-purpose workloads and are sufficient for the needs of this project without requiring manual tuning
 
 ## 3. Test Result
-
-## 5. Project Structure
-
-```text
-.
-├── src/
-│   ├── backend/         # Node.js API with Prisma
-│   └── frontend/        # React Application
-├── terraform/
-│   └── aws/
-│       ├── modules/
-│       │   ├── vpc/      # Networking & Security
-│       │   ├── database/ # Aurora & RDS Proxy
-│       │   ├── cache/    # ElastiCache
-│       │   └── compute/  # ALB, ASG & Launch Template
-│       └── main.tf       # Root configuration
-└── README.md
-```
