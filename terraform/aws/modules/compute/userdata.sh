@@ -13,7 +13,7 @@ npm install -g pm2
 
 # Clone repo
 PROJECT_ROOT="/home/ec2-user/app"
-git clone https://github.com/DipHuy/HCMUS_CLOUD-IMPLEMENTATIONS-AND-OPERATIONS.git -b feature/create-terraform-aws $PROJECT_ROOT
+git clone https://github.com/DipHuy/HCMUS_CLOUD-IMPLEMENTATIONS-AND-OPERATIONS.git -b main $PROJECT_ROOT
 
 
 # Setup ENV files
