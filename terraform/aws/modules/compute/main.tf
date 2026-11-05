@@ -19,7 +19,7 @@ resource "aws_lb_target_group" "be_tg" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
-    path = "/products" # Đường dẫn test API
+    path = "/health"
     matcher = "200-399"
   }
 }
