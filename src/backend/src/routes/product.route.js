@@ -4,6 +4,8 @@ const { auth } = require("../middleware/auth");
 const multer = require("multer");
 const storageProvider = require("../services/storage/storage.service");
 
+const cacheService = require("../services/cache.service");
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
@@ -12,7 +14,17 @@ const upload = multer({
 // get all products
 router.get("/", async (req, res) => {
   try {
-    res.json(await ProductService.getAll());
+    const CACHE_KEY = "products:all";
+    const cachedProducts = await cacheService.get(CACHE_KEY);
+    if (cachedProducts) {
+      console.log("Serving products from cache");
+      return res.json(cachedProducts);
+    }
+
+    console.log("Serving products from database");
+    const products = await ProductService.getAll();
+    await cacheService.set(CACHE_KEY, products, 3600);
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -46,6 +58,7 @@ router.post("/", upload.single("image"), auth(["ADMIN"]), async (req, res) => {
       description: description || "No description",
       image: imageUrl,
     };
+    await cacheService.del("products:all");
     res.json(await ProductService.create(newProduct));
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -72,6 +85,7 @@ router.put(
         description: description || "No description",
         image: imageUrl,
       };
+      await cacheService.del("products:all");
       res.json(await ProductService.update(req.params.id, updatedProduct));
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -81,6 +95,7 @@ router.put(
 
 router.delete("/:id", auth(["ADMIN"]), async (req, res) => {
   try {
+    await cacheService.del("products:all");
     res.json(await ProductService.delete(req.params.id));
   } catch (error) {
     res.status(500).json({ message: error.message });

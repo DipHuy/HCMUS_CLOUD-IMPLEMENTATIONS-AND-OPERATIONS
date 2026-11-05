@@ -14,6 +14,7 @@ variable "s3_bucket_id"        { type = string }
 variable "cloudfront_domain" { type = string }
 variable "aws_region"          { type = string }
 variable "iam_instance_profile_name" { type = string }
+variable "cache_endpoint" { type = string }
 
 variable "key_name" {
   type        = string

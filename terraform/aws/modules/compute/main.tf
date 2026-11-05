@@ -19,7 +19,7 @@ resource "aws_lb_target_group" "be_tg" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
-    path = "/products" # Đường dẫn test API
+    path = "/health"
     matcher = "200-399"
   }
 }
@@ -92,6 +92,7 @@ resource "aws_launch_template" "app" {
     S3_BUCKET_NAME    = var.s3_bucket_id
     CLOUDFRONT_DOMAIN = var.cloudfront_domain
     CLOUD_PROVIDER    = "AWS"
+    CACHE_ENDPOINT    = var.cache_endpoint
   }))
 
   tag_specifications {
@@ -122,5 +123,19 @@ resource "aws_autoscaling_group" "asg" {
     key                 = "Name"
     value               = "${var.project_name}-ASG-Instance"
     propagate_at_launch = true
+  }
+}
+
+# Scaling Policy CPU utilization
+resource "aws_autoscaling_policy" "cpu_scaling" {
+  name                   = "${var.project_name}-cpu-scaling"
+  autoscaling_group_name = aws_autoscaling_group.asg.name
+  policy_type            = "TargetTrackingScaling"
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 70.0
   }
 }

@@ -68,21 +68,44 @@ resource "aws_iam_instance_profile" "app_instance_profile" {
   role = aws_iam_role.app_role.name
 }
 
+module "cache" {
+  source             = "./modules/cache"
+  project_name       = var.project_name
+  private_subnet_ids = module.vpc.private_subnet_ids
+  cache_sg_id        = module.vpc.cache_sg_id
+}
+
 module "compute" {
   source                    = "./modules/compute"
   depends_on                = [module.database, module.storage]
   project_name              = var.project_name
+
+  # Environment Variables for User Data Script
+  jwt_secret                = var.JWT_SECRET
+
+  
+  # VPC and Subnets
   vpc_id                    = module.vpc.vpc_id
   public_subnet_ids         = module.vpc.public_subnet_ids
   app_sg_id                 = module.vpc.app_sg_id
   alb_sg_id                 = module.vpc.alb_sg_id
+
+  # Proxy Database
   db_proxy_endpoint         = module.database.db_proxy_endpoint
+  
+  # Database
   db_name                   = module.database.db_name
   db_username               = module.database.db_username
   db_password               = module.database.db_password
-  jwt_secret                = var.JWT_SECRET
+  
+  # Storage and CloudFront
   s3_bucket_id              = module.storage.s3_bucket_id
   cloudfront_domain         = module.storage.cloudfront_domain
   aws_region                = var.aws_region
+
+  # IAM allow EC2 to upload images to S3
   iam_instance_profile_name = aws_iam_instance_profile.app_instance_profile.name
+
+  # Cache Endpoint
+  cache_endpoint            = module.cache.primary_endpoint
 }
